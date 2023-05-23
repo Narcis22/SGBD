@@ -3,6 +3,6 @@
 
   A database model for managing supermarkets.
 
- - For code click here
- - For details and compiled code with screenshots see full paper here
- - For the graphic representation download the graph file and see the model.
+ - For code click [here](https://github.com/Narcis22/SGBD/blob/main/Proiect_SGBD_Necula_Narcis_Grupa_342_Cod_SQL_PLSQL.txt)
+ - For details and compiled code with screenshots see full paper [here](https://github.com/Narcis22/SGBD/blob/main/Proiect_SGBD_Necula_Narcis_Grupa_342.pdf)
+ - For the graphic representation download the graphml file and see the model.
