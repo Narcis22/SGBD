@@ -1,0 +1,1347 @@
+-- CERINTA 4 - Crearea tabelelor:
+
+CREATE TABLE Magazin (
+	id_magazin number(4) not null,
+	nume varchar(25) not null,
+	adresa varchar(30) not null, 
+	email varchar(30) unique not null, 
+	telefon_contact varchar(11) unique not null,
+
+	constraint magazin_pk primary key (id_magazin)
+);
+
+CREATE TABLE Angajat (
+	id_angajat number(4) not null,
+	id_magazin number(4) not null,
+	prenume varchar(25) not null,
+	nume_familie varchar(25) not null,
+	pozitie varchar(30) not null, 
+	email varchar(30) unique not null, 
+	telefon varchar(11) unique not null,
+	adresa varchar(30) not null,
+	
+	constraint angajat_pk primary key (id_angajat),
+	constraint magazin_angajat_fk foreign key (id_magazin) references magazin(id_magazin)
+);
+
+CREATE TABLE Client (
+	id_client number(4) not null,
+	prenume varchar(25) not null,
+	nume_familie varchar(25) not null,
+	email varchar(30) unique not null, 
+	telefon varchar(11) unique not null,
+	adresa varchar(30) not null,
+	
+	constraint client_pk primary key (id_client)
+);
+
+CREATE TABLE Comanda (
+	id_comanda number(4) not null,
+	id_client number(4) not null,
+	id_angajat number(4) not null,
+	data_comanda date default SYSDATE not null,
+	suma_totala number(8,2),
+	
+	constraint comanda_pk primary key (id_comanda),
+	constraint comanda_client_fk foreign key (id_client) references client(id_client),    
+	constraint comanda_angajat_fk foreign key (id_angajat) references angajat(id_angajat) ON DELETE CASCADE
+);
+
+CREATE TABLE Produs (
+	id_produs number(4) not null,
+	nume varchar(20) not null,
+	descriere varchar(100) not null, 
+	pret number(8,2) not null,
+	cantitate number(5) not null,
+	
+	constraint produs_pk primary key (id_produs)
+);
+
+CREATE TABLE Continut_comanda (
+	id_continut_comanda number(4) not null,
+	id_produs number(4) not null,
+	id_comanda number(4) not null,
+	cantitate number(5) not null,
+	pret number(8,2) not null,
+	
+	constraint continut_comanda_pk primary key (id_continut_comanda),
+	constraint continut_comanda_produs_fk foreign key (id_produs) references produs(id_produs),
+	constraint continut_comanda_comanda_fk foreign key (id_comanda) references comanda(id_comanda) ON DELETE CASCADE
+);
+
+CREATE TABLE Promotie (
+	id_promotie number(4) not null,
+	id_produs number(4) not null,
+	data_inceput date default SYSDATE not null,
+	data_sfarsit date default SYSDATE not null,
+	procent_discount number(4,2) not null, 
+
+	constraint promotie_pk primary key (id_promotie),
+	constraint promotie_produs_fk foreign key (id_produs) references produs(id_produs)
+);
+
+CREATE TABLE Furnizor (
+	id_furnizor number(4) not null,
+	nume varchar(20) not null,
+	email varchar(30) unique not null,
+	telefon varchar(11) unique not null,
+	adresa varchar(30) not null,
+	
+	constraint furnizor_pk primary key (id_furnizor)
+);
+
+CREATE TABLE Produs_furnizor (
+	id_furnizor number(4) not null,
+	id_produs number(4) not null,
+	
+	constraint furnizor_fk foreign key (id_furnizor)  references furnizor(id_furnizor),
+	constraint produs_fk foreign key (id_produs)  references produs(id_produs)
+);
+
+
+CREATE TABLE informatii_salariale (
+	id_angajat number(4) not null,
+    salariu number(10) not null,
+    ultima_marire date default SYSDATE not null,
+	
+	constraint angajat_fk foreign key (id_angajat) references angajat(id_angajat) ON DELETE CASCADE,
+    constraint info_pk primary key (id_angajat)
+);
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- CERINTA 5 - Adaugare de date
+
+CREATE SEQUENCE SEQ_MAGAZIN
+INCREMENT by 1
+START WITH 1
+MAXVALUE 10000
+NOCYCLE;
+
+insert into Magazin
+values (SEQ_MAGAZIN.NEXTVAL, 'Lidl', 'Str. V. olt, 139', 'lidl@first.com', '0700000001');
+insert into Magazin   
+values (SEQ_MAGAZIN.NEXTVAL, 'Kaufland', 'Str. V. olt, 100', 'Kaufland@DrTaberei.com', '0700000002');
+insert into Magazin   
+values (SEQ_MAGAZIN.NEXTVAL, 'Lidl', 'Sos. Berceni 8', 'lidl@second.com', '0700000003');
+insert into Magazin   
+values (SEQ_MAGAZIN.NEXTVAL, 'Profi', 'Sos. Berceni 9', 'profi@contact.com', '0700000004');
+insert into Magazin    
+values (SEQ_MAGAZIN.NEXTVAL, 'Mega Image', 'Str. Nitu Vasile, 1', 'mega@image.com', '0700000005');
+insert into Magazin  
+values (SEQ_MAGAZIN.NEXTVAL, 'Cora', 'Sos. VACARESTI, 12', 'Cora@sunplaza.com', '0700000006');
+commit;
+select* from Magazin;
+
+
+CREATE SEQUENCE SEQ_ANGAJAT
+INCREMENT by 1
+START WITH 1
+MAXVALUE 10000
+NOCYCLE;
+
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 1, 'Andrei', 'Pascu', 'Casier', 'andrei.pascu@gmail.com', '0700000007', 'Str Albu 1, b1');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 1, 'Sergiu', 'Dan', 'Logistica', 'sergiu.dan@gmail.com', '0700000008', 'Str Barbu 1, b2');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 1, 'Alex', 'Moraru', 'Manager', 'alex.moraru@gmail.com', '0700000009', 'Str Coltea 1, 123');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 2, 'Alexandru', 'Marinescu', 'Casier', 'alexandru.marinescu@gmail.com', '0700000010', 'Sos Vacaresti 4, 14');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 2, 'Florin', 'Constantinescu', 'Logistica', 'florin.constantin@gmail.com', '0700000011', 'Str Albu 1, 52');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 2, 'Aniela', 'Macovei', 'Manager', 'aniela.macovei@gmail.com', '0700000012', 'Bld Berceni 4, 31');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 3, 'Corina', 'Caldararu', 'Casier', 'corina.caldararu@gmail.com', '0700000013', 'Sos Albu 1, 45');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 3, 'Ana', 'Matei', 'Logistica', 'ana.matei@gmail.com', '0700000014', 'Bld Berceni 15, 44');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 3, 'Mihaela', 'Anton', 'Manager', 'mihaela.anton@gmail.com', '0700000015', 'Sos Berceni 1, 554');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 4, 'Narcis', 'Andrei', 'Casier', 'narcis.andrei@gmail.com', '0700000016', 'Str Albu 6, 3');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 4, 'Denis', 'Constantin', 'Logistica', 'denis.constantin@gmail.com', '0700000017', 'Str Oltenitei 1, C34');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 4, 'Andrada', 'Olteanu', 'Manager', 'andrada.olteanu@gmail.com', '0700000018', 'Str Vacaresti 1, b1');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 5, 'Marian', 'Nisoi', 'Casier', 'marian.nisoi@gmail.com', '0700000019', 'Bld Albu 1, b1');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 5, 'Mihai', 'Paraschiva', 'Logistica', 'mihai.paraschiva@gmail.com', '0700000020', 'Str Oltenitei 1, b1');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 5, 'Florin', 'Sandoiu', 'Manager', 'florin.sandoiu@gmail.com', '0700000021', 'Str Oltenitei 1, b1');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 6, 'Simona', 'Constantin', 'Casier', 'simona.constantin@gmail.com', '0700000022', 'Sos Vacaresti 9, b1');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 6, 'Andrei', 'Zidaru', 'Logistica', 'andrei.zidaru@gmail.com', '0700000023', 'Bld Oltenitei 3, b1');
+insert into Angajat   
+values (SEQ_ANGAJAT.NEXTVAL, 6, 'Iulian', 'Tutu', 'Manager', 'iulian.tutu@gmail.com', '0700000024', 'Sos Vacaresti 1, b1');
+commit;
+select* from Angajat;
+
+CREATE SEQUENCE SEQ_CLIENT
+INCREMENT by 1
+START WITH 1
+MAXVALUE 10000
+NOCYCLE;
+
+INSERT INTO Client  
+VALUES ( SEQ_CLIENT.NEXTVAL, 'Felicia', 'Bunescu', 'felicia.bunescu@gmail.com', '0700000025', 'Bld. Marasesti 12');
+INSERT INTO Client  
+VALUES ( SEQ_CLIENT.NEXTVAL, 'Denisa', 'Predescu', 'denisa.predescu@gmail.com', '0700000026', 'Str Astronomului 12');
+INSERT INTO Client  
+VALUES ( SEQ_CLIENT.NEXTVAL, 'Marius', 'Anca', 'marius.anca@gmail.com', '0700000027', 'Bld. Marasesti 33');
+INSERT INTO Client  
+VALUES ( SEQ_CLIENT.NEXTVAL, 'Constantin', 'Corban', 'constantin.corban@gmail.com', '0700000028', 'Bld. Dacia 24');
+INSERT INTO Client  
+VALUES ( SEQ_CLIENT.NEXTVAL, 'Andrei', 'Avram', 'andrei.avram@gmail.com', '0700000029', 'Str. nitu Vasile 11');
+INSERT INTO Client  
+VALUES ( SEQ_CLIENT.NEXTVAL, 'Bogdan', 'Maftei', 'bogdan.maftei@gmail.com', '0700000030', 'Sos. Oltenitei 7');
+commit;
+SELECT * FROM Client;
+
+
+CREATE SEQUENCE SEQ_COMANDA
+INCREMENT by 1
+START WITH 1
+MAXVALUE 10000
+NOCYCLE;
+
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 1, 1, to_date('12-01-2022','dd-mm-yyyy'), 123.2);
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 3, 4, to_date('22-01-2022','dd-mm-yyyy'), 100.21);
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 3, 7, to_date('01-01-2022','dd-mm-yyyy'), 23);
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 5, 10, to_date('05-02-2022','dd-mm-yyyy'), 24.54);
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 5, 13, to_date('14-02-2022','dd-mm-yyyy'), 129.99);
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 2, 16, to_date('14-02-2022','dd-mm-yyyy'), 56.05);
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 2, 4, to_date('16-02-2022','dd-mm-yyyy'), 59.99);
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 2, 7, to_date('16-03-2022','dd-mm-yyyy'), 114.11);
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 6, 4, to_date('09-04-2022','dd-mm-yyyy'), 185.22);
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 4, 7, to_date('10-04-2022','dd-mm-yyyy'), 265.99);
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 5, 4, to_date('06-05-2022','dd-mm-yyyy'), 157.22);
+INSERT INTO Comanda  
+VALUES ( SEQ_COMANDA.NEXTVAL, 6, 7, to_date('05-06-2022','dd-mm-yyyy'), 321);
+INSERT INTO Comanda
+VALUES ( SEQ_COMANDA.NEXTVAL, 6, 1, to_date('28-06-2022','dd-mm-yyyy'), 12.6);
+commit;
+SELECT * FROM Comanda;
+
+
+CREATE SEQUENCE SEQ_PRODUS
+INCREMENT by 1
+START WITH 1
+MAXVALUE 10000
+NOCYCLE;
+
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Banane', 'Banane dole pret per KG', 6.99, 100);
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Rosii', 'Rosii pret per KG', 4.49, 100);
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Rosii cherry', 'Pret la bucata', 12.00, 100);
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Paine graham', 'Paine cu faina integrala', 7.35, 100);
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Painea Campionilor', 'Paine cu multe seminte', 9.25, 100);
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Mango', 'Mango pret per bucata', 8.10, 100);
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Lapte Pilos 1.5', 'Lapte 1.5% grasime', 4.99, 100);
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Lapte Pilos 3.5', 'Lapte 3.5%', 5.79, 100);
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Telemea Pilos', 'Telemea de vaca, per kg', 23.99, 100);
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Sushi', 'sushi autentic', 26.99, 100);
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Sushi XL', 'Sushi XL autentic', 46.99, 100);
+INSERT INTO Produs   
+VALUES ( SEQ_PRODUS.NEXTVAL, 'Gogosi 6 Buc', 'Gogosi gem', 9, 100);
+commit;
+SELECT * FROM Produs;
+
+
+
+CREATE SEQUENCE SEQ_CONTINUT_COMANDA
+INCREMENT by 1
+START WITH 1
+MAXVALUE 10000
+NOCYCLE;
+
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 11, 1, 2, 46.99);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 10, 1, 1, 29.22);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 6, 2, 10, 10.02);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 3, 3, 2, 11.5);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 2, 4, 6, 4.09);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 9, 5, 4, 32.5);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 8, 6, 10, 5.6);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 8, 7, 10, 6);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 2, 8, 22, 5.18);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 4, 9, 10, 7.35);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 5, 9, 11, 10.15);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 5, 10, 25, 10.64);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 12, 11, 15, 10.48);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 10, 12, 2, 26.99);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 11, 12, 1, 46.99);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 12, 12, 4, 9);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 9, 12, 8, 23);
+INSERT INTO Continut_comanda   
+VALUES ( SEQ_CONTINUT_COMANDA.NEXTVAL, 12, 13, 1, 12.6);
+commit;
+SELECT * FROM Continut_comanda;
+
+
+
+CREATE SEQUENCE SEQ_PROMOTIE
+INCREMENT by 1
+START WITH 1
+MAXVALUE 10000
+NOCYCLE;
+
+INSERT INTO Promotie   
+VALUES ( SEQ_PROMOTIE.NEXTVAL, 3, TO_DATE('16-02-2022','dd-mm-yyyy'), TO_DATE('26-02-2022','dd-mm-yyyy'), 10.00);
+INSERT INTO Promotie   
+VALUES ( SEQ_PROMOTIE.NEXTVAL, 5, TO_DATE('01-04-2021','dd-mm-yyyy'), TO_DATE('16-04-2021','dd-mm-yyyy'), 33.00);
+INSERT INTO Promotie   
+VALUES ( SEQ_PROMOTIE.NEXTVAL, 6, TO_DATE('11-02-2022','dd-mm-yyyy'), TO_DATE('11-03-2022','dd-mm-yyyy'), 25.00);
+INSERT INTO Promotie   
+VALUES ( SEQ_PROMOTIE.NEXTVAL, 7, TO_DATE('09-05-2022','dd-mm-yyyy'), TO_DATE('29-05-2022','dd-mm-yyyy'), 5.00);
+INSERT INTO Promotie   
+VALUES ( SEQ_PROMOTIE.NEXTVAL, 2, TO_DATE('26-02-2021','dd-mm-yyyy'), TO_DATE('20-03-2021','dd-mm-yyyy'), 33.33);
+INSERT INTO Promotie   
+VALUES ( SEQ_PROMOTIE.NEXTVAL, 12, TO_DATE('02-03-2021','dd-mm-yyyy'), TO_DATE('12-03-2021','dd-mm-yyyy'), 15.00);
+INSERT INTO Promotie   
+VALUES ( SEQ_PROMOTIE.NEXTVAL, 9, TO_DATE('11-04-2021','dd-mm-yyyy'), TO_DATE('21-04-2021','dd-mm-yyyy'), 60.00);
+INSERT INTO Promotie   
+VALUES ( SEQ_PROMOTIE.NEXTVAL, 10, TO_DATE('08-07-2022','dd-mm-yyyy'), TO_DATE('18-09-2022','dd-mm-yyyy'), 75.00);
+INSERT INTO Promotie   
+VALUES ( SEQ_PROMOTIE.NEXTVAL, 10, TO_DATE('01-10-2022','dd-mm-yyyy'), TO_DATE('29-11-2022','dd-mm-yyyy'), 25.00);
+commit;
+SELECT * FROM Promotie;
+
+
+
+CREATE SEQUENCE SEQ_FURNIZOR
+INCREMENT by 1
+START WITH 1
+MAXVALUE 10000
+NOCYCLE;
+
+
+INSERT INTO Furnizor   
+VALUES ( SEQ_FURNIZOR.NEXTVAL, 'Pilos', 'pilos@contact.com', '0700000031', 'Str. Business 43');
+INSERT INTO Furnizor   
+VALUES ( SEQ_FURNIZOR.NEXTVAL, 'Star', 'star@contact.com', '0700000032', 'Str. Business 44');
+INSERT INTO Furnizor   
+VALUES ( SEQ_FURNIZOR.NEXTVAL, 'Milbona', 'milbona@contact.com', '0700000033', 'Str. Business 45');
+INSERT INTO Furnizor   
+VALUES ( SEQ_FURNIZOR.NEXTVAL, 'Dole', 'dole@contact.com', '0700000034', 'Str. Business 46');
+INSERT INTO Furnizor   
+VALUES ( SEQ_FURNIZOR.NEXTVAL, 'Coca-Cola', 'coca.cola@contact.com', '0700000035', 'Str. Business 47');
+INSERT INTO Furnizor   
+VALUES ( SEQ_FURNIZOR.NEXTVAL, 'Uniliver', 'uniliver@contact.com', '0700000036', 'Str. Business 48');
+commit;
+SELECT * FROM Furnizor;
+
+
+INSERT INTO Produs_furnizor   
+VALUES ( 1, 1);
+INSERT INTO Produs_furnizor   
+VALUES ( 1, 2);
+INSERT INTO Produs_furnizor   
+VALUES ( 1, 3);
+INSERT INTO Produs_furnizor   
+VALUES ( 1, 4);
+INSERT INTO Produs_furnizor   
+VALUES ( 1, 5);
+INSERT INTO Produs_furnizor   
+VALUES ( 2, 2);
+INSERT INTO Produs_furnizor   
+VALUES ( 2, 4);
+INSERT INTO Produs_furnizor   
+VALUES ( 2, 5);
+INSERT INTO Produs_furnizor   
+VALUES ( 2, 6);
+INSERT INTO Produs_furnizor  
+VALUES ( 2, 3);
+INSERT INTO Produs_furnizor 
+VALUES ( 3, 6);
+INSERT INTO Produs_furnizor   
+VALUES ( 3, 7);
+INSERT INTO Produs_furnizor   
+VALUES ( 3, 4);
+INSERT INTO Produs_furnizor   
+VALUES ( 3, 3);
+INSERT INTO Produs_furnizor   
+VALUES ( 3, 5);
+INSERT INTO Produs_furnizor   
+VALUES ( 4, 2);
+INSERT INTO Produs_furnizor   
+VALUES ( 4, 9);
+INSERT INTO Produs_furnizor   
+VALUES ( 4, 10);
+INSERT INTO Produs_furnizor   
+VALUES ( 4, 11);
+INSERT INTO Produs_furnizor   
+VALUES ( 4, 12);
+INSERT INTO Produs_furnizor   
+VALUES ( 4, 8);
+INSERT INTO Produs_furnizor   
+VALUES ( 4, 9);
+commit;
+SELECT * FROM Produs_furnizor;
+
+insert into informatii_salariale   
+values (1, 2000, to_date('05-06-2021','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (2, 2200, to_date('02-06-2022','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (3, 3000, to_date('03-05-2023','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (4, 2100, to_date('04-06-2022','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (5, 2500, to_date('05-06-2021','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (6, 4000, to_date('06-06-2022','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (7, 1900, to_date('01-06-2022','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (8, 2200, to_date('01-06-2021','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (9, 2900, to_date('08-06-2021','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (10, 2300, to_date('09-06-2022','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (11, 2700, to_date('05-06-2022','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (12, 3500, to_date('11-06-2022','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (13, 2100, to_date('01-02-2023','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (14, 2900, to_date('03-03-2023','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (15, 4100, to_date('04-04-2023','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (16, 2900, to_date('01-02-2023','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (17, 3200, to_date('01-03-2023','dd-mm-yyyy'));
+insert into informatii_salariale   
+values (18, 4900, to_date('03-02-2023','dd-mm-yyyy'));
+
+commit;
+select* from informatii_salariale;
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+-- CERINTA 6
+
+-- Determinati produsul care se vinde cel mai bine. Daca exista mai multe cu acelasi numar de vanzari se afiseaza toate.
+
+CREATE OR REPLACE PROCEDURE cel_mai_bine_vandut_produs
+IS 
+	TYPE tabel_indexat IS TABLE OF continut_comanda.cantitate%type INDEX BY PLS_INTEGER;
+	TYPE tabel_imbricat IS TABLE OF continut_comanda.id_produs%type;
+
+	nr_unitati_vandute tabel_indexat;  -- numarul de unitati vandute din fiecare produs vandut
+	produse_vandute tabel_imbricat := tabel_imbricat();    --Id-urile produselor vandute
+
+	cantitate_maxima number := 0;
+	i number := 0; -- indice de parcurgere 
+	nume_produs produs.nume%type;
+BEGIN 
+	
+	FOR vanzare IN ( SELECT id_produs, cantitate 
+    				 FROM continut_comanda) LOOP
+        i := 1;
+
+		WHILE i <= produse_vandute.COUNT AND produse_vandute(i) != vanzare.id_produs LOOP -- Cautam daca exista deja inregistrare de vanzare a acestui produs
+			i := i + 1;
+        END LOOP;
+		
+		IF i = produse_vandute.COUNT + 1 THEN  -- In caz ca nu am gasit produsul deja adaugat il adaugam in lista de produse vandute
+			produse_vandute.EXTEND;
+			produse_vandute(produse_vandute.COUNT) := vanzare.id_produs;
+            nr_unitati_vandute(produse_vandute.COUNT) := vanzare.cantitate;
+		
+			IF nr_unitati_vandute(produse_vandute.COUNT) > cantitate_maxima THEN -- Calculam cantitatea maxima in timp real pt eficienta
+				cantitate_maxima := nr_unitati_vandute(produse_vandute.COUNT);
+        	END IF;
+		ELSE -- in cazul unui produs deja inregistrat ca vandut doar adaugam cantitatea noua la cea existenta
+        	nr_unitati_vandute(i) := nr_unitati_vandute(i) + vanzare.cantitate;
+    		
+			IF nr_unitati_vandute(i) > cantitate_maxima THEN-- Calculam cantitatea maxima in timp real pt eficienta
+    			cantitate_maxima := nr_unitati_vandute(i);
+            END IF;
+		END IF;
+    END LOOP;
+
+	IF cantitate_maxima = 0 THEN
+		dbms_output.put_line('Nu avem vanzari inregistrate');
+    ELSE
+    	FOR i IN 1..produse_vandute.COUNT LOOP -- Cautam numele produsului cu cantitate maxima vanduta si ii aflisam un mesaj intuitiv
+    		IF nr_unitati_vandute(i) = cantitate_maxima THEN
+    			SELECT nume INTO nume_produs
+            	FROM produs
+            	WHERE id_produs = produse_vandute(i);
+    
+            	dbms_output.put_line('Produs cel mai bine vandut: ' || nume_produs || ' in cantitate de: ' || cantitate_maxima || ' unitati');
+            END IF;
+        END LOOP;
+    END IF;
+END;
+/
+
+EXECUTE cel_mai_bine_vandut_produs;
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- CERINTA 7
+
+-- Determinati magazinul/magazinele cu cele mai bune salarii in medie pentru angajatii sai si afisati doar numele acestuia.
+CREATE OR REPLACE PROCEDURE calcularea_magazinului_cu_plata_cea_mai_buna
+IS
+    TYPE lista_id IS TABLE OF angajat.id_magazin%type;
+    CURSOR salariile_medii IS -- creez cursor pentru aflarea salariilor medii oferite de fiecare magazin
+    	SELECT AVG(salariu), id_magazin
+    	FROM informatii_salariale JOIN (SELECT id_angajat, id_magazin
+        								FROM angajat) USING (id_angajat)
+    	GROUP BY id_magazin;
+
+	media_curenta number;
+	magazin_curent angajat.id_magazin%type;
+	maxim_medie_salarii number := 0;
+	lista_magazine lista_id := lista_id();
+	nume_magazin magazin.nume%type;
+BEGIN
+    OPEN salariile_medii;
+    	LOOP
+    		FETCH salariile_medii into media_curenta, magazin_curent; -- parcurg datele din cursor una cate una
+    		EXIT WHEN salariile_medii%NOTFOUND;
+    
+    		IF media_curenta > maxim_medie_salarii THEN -- aflu media maxima si salvez toate magazinele care o ofera
+            	maxim_medie_salarii := media_curenta;
+    			lista_magazine.DELETE;
+    			lista_magazine.extend;
+    			lista_magazine(lista_magazine.COUNT) := magazin_curent;
+    		ELSIF media_curenta = maxim_medie_salarii THEN
+    			lista_magazine.extend;
+    			lista_magazine(lista_magazine.COUNT) := magazin_curent;
+            END IF;
+    	END LOOP;
+	CLOSE salariile_medii;
+
+	IF lista_magazine.COUNT = 0 THEN -- in cazul in care nu avem date sause intampla ceva la preluarea datelor.
+        dbms_output.put_line('NU avem date despre salariile oferite');
+	ELSE 
+
+        FOR i IN 1..lista_magazine.COUNT LOOP -- preiau numele magazinului bazat pe id-ul salvat mai devreme
+            SELECT nume INTO nume_magazin
+            FROM magazin
+            WHERE id_magazin = lista_magazine(i);
+
+        	dbms_output.put_line('Cele mai bune salarii sunt oferite de ' || nume_magazin || ' ');
+		END LOOP;
+   END IF;
+
+END calcularea_magazinului_cu_plata_cea_mai_buna;
+/
+
+EXECUTE calcularea_magazinului_cu_plata_cea_mai_buna;
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+-- CERINTA 8
+
+-- -- Efectuati maririle de salariu pentru angajatii unui magazin dat care sunt la rand sa le primeasca(are mai mult de un an de la ultima marire). Afisati numele, slariul vechi si cel nou,si pozitia angajatului care primeste marirea.
+
+-- Creez noi tipuri de date globale pentru a putea returna toate datele de care am nevoie intr-o lista de obiecte
+CREATE OR REPLACE TYPE tabel_de_returnat_mariri IS OBJECT ( nume varchar(100),
+    													    salariu_vechi number(10),
+     														salariu_nou number(10),
+     														pozitie varchar(100));
+/
+CREATE OR REPLACE TYPE tabel_mariri IS TABLE OF tabel_de_returnat_mariri;
+/
+
+CREATE OR REPLACE FUNCTION angajati_acordare_marire(nume_magazin magazin.nume%type, procent_de_marire number) 
+RETURN tabel_mariri IS
+    
+	nr_magazine_numite_la_fel number := 0;
+	lista_mariri tabel_mariri := tabel_mariri();
+
+	TOO_MANY_STORES EXCEPTION;
+    NO_STORE_FOUND EXCEPTION;
+BEGIN
+    SELECT COUNT(id_magazin) INTO nr_magazine_numite_la_fel
+    FROM magazin
+    WHERE ((UPPER(nume) LIKE UPPER(nume_magazin)) OR (UPPER(adresa) LIKE UPPER(nume_magazin))); -- Verific daca magazinul introdus are acelasi nume cu alt magazin din lista
+																								-- sau daca adresa sau numele introdus este valid
+
+	IF nr_magazine_numite_la_fel > 1 THEN -- in cazul in care avem mai multe magazine cu acelasi nume trebuie inrtodusa adresa
+    	raise TOO_MANY_STORES; 
+    ELSIF nr_magazine_numite_la_fel = 0 THEN -- in cazul in care numele sau adresa introdusa nu au fost gasite
+    	raise NO_STORE_FOUND;
+    END IF;
+
+	FOR linie IN (  SELECT prenume || ' ' || nume_familie as nume, 
+        				   salariu as salariu_vechi, 
+        				   (salariu + (salariu * procent_de_marire / 100)) as salariu_nou, 
+        				   pozitie, 
+        			       a.id_angajat -- preluam datele ce trebuiesc returnate
+                    FROM angajat a JOIN informatii_salariale i_s ON (a.id_angajat = i_s.id_angajat)
+                    			   JOIN magazin m ON (m.id_magazin = a.id_magazin) -- folosim 3 tabele - magazin. informatii_saalriale si angajat
+                    WHERE ( (UPPER(m.nume) LIKE UPPER(nume_magazin)) OR               --verific daca numele saua ddresa se potrivesc si conditia de acordare a maririi
+        					(UPPER(m.adresa) LIKE UPPER(nume_magazin))) AND 
+        					i_s.ultima_marire NOT BETWEEN (SYSDATE-365) AND SYSDATE) LOOP 
+    	lista_mariri.extend;
+		lista_mariri(lista_mariri.COUNT) := tabel_de_returnat_mariri(linie.nume,  linie.salariu_vechi, linie.salariu_nou, linie.pozitie); -- adaugam in lista de returnat
+
+    	UPDATE informatii_salariale -- facem schimarea salariului cu cel marit
+        SET salariu = linie.salariu_nou,
+            ultima_marire = SYSDATE
+        WHERE id_angajat = linie.id_angajat;
+    END LOOP;
+
+	IF lista_mariri.COUNT = 0 THEN -- in cazul in care pt magazinul ales nu exista angajati care primesc marire
+    	raise NO_DATA_FOUND;
+    END IF;
+
+	RETURN lista_mariri;
+
+ EXCEPTION -- definim exceptiile
+    WHEN NO_DATA_FOUND THEN
+    	RAISE_APPLICATION_ERROR(-20004, 'Nu avem angajati care se califica pentru mariri');
+	WHEN TOO_MANY_STORES THEN
+    	RAISE_APPLICATION_ERROR(-20003, 'Prea multe magazine cu acelasi nume, introduceti adresa si incercati din nou');
+	WHEN NO_STORE_FOUND THEN
+    	RAISE_APPLICATION_ERROR(-20002, 'Nu am gasit magazin cu acest nume sau adresa');
+    WHEN others THEN
+    	RAISE_APPLICATION_ERROR(-20001, SQLERRM);
+
+END angajati_acordare_marire;
+/
+    
+DECLARE 
+	lista_afisare tabel_mariri := tabel_mariri();
+BEGIN
+    -- Decomentati cate una si rulati individual
+	-- lista_afisare := angajati_acordare_marire('CORA', 10); -- nu avem mariri deci NO_DATA_FOUND
+	-- lista_afisare := angajati_acordare_marire('lidl', 10); -- TOO_MANY_STORES
+	-- lista_afisare := angajati_acordare_marire('Str. V. olt, 139', 10); -- OK , fix pt cea anterioara
+	-- lista_afisare := angajati_acordare_marire('Metro', 10); -- NO_STORE_FOUND
+
+	FOR i IN 1..lista_afisare.COUNT LOOP
+		dbms_output.put_line(i || '. ' || lista_afisare(i).nume || ' -- Salariul vechi: ' || lista_afisare(i).salariu_vechi || ' -- Salariul nou: ' || lista_afisare(i).salariu_nou || ' -- Pozitia: ' || lista_afisare(i).pozitie);
+    END LOOP;
+END;
+/
+
+select * from informatii_salariale;
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+-- CERINTA 9
+
+-- Un furnizor vine si anunta ca toate produsele loc care contin alune au fost contaminate si trebuiesc contactati toti clientii care au cumparat produse ce contin un produs dat, de la acest furnizor.
+-- Trebuie sa afisam o lista cu emailurile si numerele de telefon ale tuturor clientilor afectati.
+
+CREATE OR REPLACE PROCEDURE clienti_afectati_de_rechemare(furnizor_afectat furnizor.nume%type, 
+    													  element_rechemat produs.descriere%type) IS
+	TYPE client_afectat IS TABLE OF VARCHAR(1000);
+
+	lista_clienti_afectati client_afectat := client_afectat(); -- Definim lista ce va fi afisata
+	id_furnizor_afectat furnizor.id_furnizor%type;
+
+	NO_AFFECTED_CLIENTS EXCEPTION; -- declar exceptia care nu e predefinita
+BEGIN
+	SELECT id_furnizor INTO id_furnizor_afectat -- Verificam daca furnizoruil inclus exista / este unic
+    FROM furnizor
+    WHERE UPPER(nume) LIKE UPPER(furnizor_afectat);
+    
+	SELECT 'Date de contact client - email: ' || email || ', numarul de telefon: ' || telefon || ' va trebui contactat.' BULK COLLECT INTO lista_clienti_afectati -- Cream textul de afisat cu datele clientului 
+    FROM client
+    WHERE id_client IN (SELECT id_client -- preluam toate comenzile care contin produse afectate
+    					FROM comanda
+    					WHERE id_comanda IN (SELECT id_comanda
+    										 FROM continut_comanda
+    										 WHERE id_produs IN (SELECT id_produs -- preluam toate produsele care contin elementul rechemat pt ca asta le afecteaza
+    															 FROM produs
+    															 WHERE (UPPER(descriere) LIKE '%' || UPPER(element_rechemat) || '%') 
+    																   AND id_produs IN (SELECT id_produs
+    																	  		 		 FROM produs_furnizor
+    																					 WHERE id_furnizor = id_furnizor_afectat))));
+
+	IF lista_clienti_afectati.COUNT = 0 THEN
+		RAISE NO_AFFECTED_CLIENTS;
+	END IF;
+
+    FOR i IN 1..lista_clienti_afectati.COUNT LOOP
+		dbms_output.put_line(lista_clienti_afectati(i));
+    END LOOP;
+
+    EXCEPTION -- definim exceptiile
+        WHEN NO_DATA_FOUND THEN
+        	RAISE_APPLICATION_ERROR(-20004, 'Nu exista furnizori afectati pentru produsele vandute.'); -- suprascriu exceptiile cu mesaje customizate
+    	WHEN TOO_MANY_ROWS THEN
+        	RAISE_APPLICATION_ERROR(-20003, 'Furnizorul nu poate fi identificat pentu ca exista mai multi cu acelasi nume.');-- suprascriu exceptiile cu mesaje customizate
+    	WHEN NO_AFFECTED_CLIENTS THEN
+        	RAISE_APPLICATION_ERROR(-20002, 'Nici un client nu a fost afectat de aceste produse!'); -- definesc exceptia nou declarata
+        WHEN others THEN
+        	RAISE_APPLICATION_ERROR(-20001, SQLERRM);
+END clienti_afectati_de_rechemare;
+/
+    
+-- EXECUTE clienti_afectati_de_rechemare('PILOS', 'paine'); -- OK
+-- EXECUTE clienti_afectati_de_rechemare('Pepsi', 'cola'); -- NO_DATA_FOUND
+
+-- Urmatoarele comenzi (urmatoarele 7 linii) vor fi rulate impreuna
+-- -- Adaug date dublura
+-- INSERT INTO Furnizor   
+-- VALUES ( SEQ_FURNIZOR.NEXTVAL, 'Pilos', 'pilosX@contact.com', '0700000099', 'Str. Business xx');
+
+-- EXECUTE clienti_afectati_de_rechemare('PILOS', 'paine'); -- TOO_MANY_ROWS
+
+-- -- Elimin datele adaugate
+-- DELETE FROM furnizor
+-- WHERE telefon like '0700000099'
+	
+-- EXECUTE clienti_afectati_de_rechemare('PILOS', 'Caseina'); -- NO_AFFECTED_CLIENTS
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- CERINTA 10. Dupa ce se sterg angajati verificati daca magazinele au cel putin un angajat pe angajat pe fiecare post (manager, logistics, casier).
+
+CREATE OR REPLACE TRIGGER verifica_angajati_departamente
+	AFTER DELETE ON angajat
+DECLARE 
+	CURSOR lista_magazine IS -- preiau lista de id-uri ale magazinelor
+		SELECT id_magazin
+		FROM magazin;
+
+	numar_manageri  number := 0;
+	numar_logistica  number := 0;
+	numar_casieri  number := 0;
+BEGIN
+	FOR elem IN lista_magazine LOOP
+		SELECT COUNT(*) INTO numar_manageri -- numar cati angajati mai sunt in pozitia de manager la magazinul curent
+    	FROM angajat
+   		WHERE UPPER(pozitie) LIKE 'MANAGER' AND id_magazin = elem.id_magazin;
+ 	
+		SELECT COUNT(*) INTO numar_logistica -- numar cati angajati mai sunt in pozitia de logistica la magazinul curent
+    	FROM angajat
+   		WHERE UPPER(pozitie) LIKE 'LOGISTICA' AND id_magazin = elem.id_magazin;
+
+		SELECT COUNT(*) INTO numar_casieri -- numar cati angajati mai sunt in pozitia de casier la magazinul curent
+    	FROM angajat
+   		WHERE UPPER(pozitie) LIKE 'CASIER' AND id_magazin = elem.id_magazin;
+    END LOOP;
+
+	IF numar_manageri = 0 OR numar_logistica = 0 OR numar_casieri = 0 THEN
+		RAISE_APPLICATION_ERROR('-20008', 'NU putem avea deppartamente fara nici un angajat. Fiecare magazin trebuie sa ramana cu cel putin un Manager, un angajat in logistica si un casier.');
+    END IF;
+END;
+/
+
+-- Rulam comanda si nu ne permite sa stergem pentru ca nu exista alt manager la magazinul cu id-ul 6
+-- DELETE FROM angajat
+-- WHERE id_angajat = 18;
+    
+-- adaugam noi angajati pentru a avea cel putin 2 angajati pe poziitiile din care vrem sa stergem
+-- insert into Angajat   
+-- values (SEQ_ANGAJAT.NEXTVAL, 6, 'Test', 'Dummy 1', 'Casier', 'test1@gmail.com', '0700001001', 'Str Albu 1, b1');
+-- insert into Angajat   
+-- values (SEQ_ANGAJAT.NEXTVAL, 6, 'Test', 'Dummy 2', 'Manager', 'test2@gmail.com', '0700001002', 'Str Albu 2, b1');
+-- insert into Angajat   
+-- values (SEQ_ANGAJAT.NEXTVAL, 6, 'Test', 'Dummy 3', 'Logistica', 'test3@gmail.com', '0700001003', 'Str Albu 3, b1');
+
+-- acum stergem angajati de la un magazin si va fi permis pt ca raman cel putin unul pe fiecare pozitie
+-- DELETE FROM angajat
+-- WHERE id_angajat = 18;
+
+
+SELECT * FROM ANGAJAT;
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+-- CERINTA 11
+
+-- LMD la nivel de linie -- nu permite inserarea unei promotii daca exista una activa
+-- Daca promotia exista cu aceeasi valoare o extindem
+-- daca exista o promotie dar valoarea acesteia e mai mica se mareste la noua valoare
+-- daca exista si noua valoare e mai mica se pastreaza valoarea mai mare.
+
+CREATE OR REPLACE PROCEDURE actualizare_data_promotiei(noua_data_sfarsit promotie.data_sfarsit%TYPE, id_promotie_de_actualizat promotie.id_promotie%TYPE) 
+AS PRAGMA AUTONOMOUS_TRANSACTION; -- ca sa putem modifica datele in trigger.
+BEGIN
+	UPDATE promotie
+    SET data_sfarsit = noua_data_sfarsit 
+    WHERE id_promotie = id_promotie_de_actualizat;
+	COMMIT;
+END;
+/
+
+CREATE OR REPLACE PROCEDURE sterge_promotie(id_promotie_de_sters promotie.id_promotie%TYPE) AS
+BEGIN
+    DELETE FROM promotie
+    WHERE id_promotie = id_promotie_de_sters;
+END;
+/
+
+
+CREATE OR REPLACE TRIGGER promotie_activa 
+	BEFORE INSERT ON promotie
+	FOR EACH ROW
+DECLARE 
+    discount_existent promotie.procent_discount%type;
+	exista_promotie_activa number := 0;
+	id_promotie_existenta promotie.id_promotie%type;
+BEGIN
+    SELECT COUNT(*) INTO exista_promotie_activa -- cautam promotiile active
+	FROM promotie
+    WHERE data_sfarsit >= SYSDATE AND :NEW.id_produs = id_produs;
+	
+    IF exista_promotie_activa >= 1 THEN
+		SELECT procent_discount, id_promotie INTO discount_existent, id_promotie_existenta -- preluam date despre acestea
+    	FROM promotie
+        WHERE data_sfarsit >= SYSDATE AND id_produs = :NEW.id_produs;
+
+    	IF :NEW.procent_discount < discount_existent THEN
+			RAISE_APPLICATION_ERROR(-20005, 'Exista promotie activa mai mare. Promotia activa este de ' || discount_existent);
+
+		ELSIF :NEW.procent_discount = discount_existent THEN
+            actualizare_data_promotiei(:NEW.data_sfarsit, id_promotie_existenta);
+			RAISE_APPLICATION_ERROR(-20006, 'Exista promotie activa cu acelsi discount. Aceasta a fost actualizata cu noua data de sfarsit.');
+
+		ELSIF :NEW.procent_discount > discount_existent THEN
+            sterge_promotie(id_promotie_existenta);
+			dbms_output.put_line('O promotie mai mica a fost stearsa si cea noua i-a luat locul.');
+		END IF;
+    END IF;
+END;
+/
+
+-- insereaza fara declansarea unei erori pentru ca nu exista promotii active
+-- INSERT INTO Promotie   
+-- VALUES ( SEQ_PROMOTIE.NEXTVAL, 10, SYSDATE, TO_DATE('01-06-2023','dd-mm-yyyy'), 10.00); 
+
+-- Se actualizeaza data de sfarsit
+INSERT INTO Promotie 
+VALUES ( SEQ_PROMOTIE.NEXTVAL, 10, SYSDATE, TO_DATE('05-06-2023','dd-mm-yyyy'), 10.00); 
+
+select * from promotie;
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- CERINTA 12
+
+ CREATE TABLE log_modificari (    
+     nume_utilizator varchar2(100),
+     nume_bd varchar2(100),
+     eveniment varchar2(100),
+     nume_obiect varchar2(100),
+     data DATE,
+     mesaj varchar2(100)
+ );
+
+-- Creez un tabel pentru loguri sa stim ce erori au aparut si ce modificari facurte de cine au fost realizate asupra schemei bazei de date.
+CREATE OR REPLACE PROCEDURE adaugare_log(mesaj varchar2) IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+BEGIN
+    INSERT INTO log_modificari
+    VALUES (SYS.LOGIN_USER, SYS.DATABASE_NAME, SYS.SYSEVENT, SYS.DICTIONARY_OBJ_NAME, SYSDATE, mesaj);
+    commit;
+END;
+/
+
+CREATE OR REPLACE TRIGGER limitare_acces_ore_lucratoare 
+    BEFORE CREATE OR ALTER OR DROP ON SCHEMA
+BEGIN
+
+    IF SYS.LOGIN_USER <> 'NARCIS1' THEN -- numele admin, numai el are permisiunea de modificare a structurii
+        adaugare_log('Administratorul este singurul care poate modifica structura bazei de date.');
+        RAISE_APPLICATION_ERROR(-20009, 'Nu aveti permisiunile necesare pentru aceasta actiune.');
+    ELSE
+        -- verific  programul fiecarei zile sa nu fie suprapus cu ora si ziua curenta
+        IF (((TO_CHAR(SYSDATE, 'D') BETWEEN 2 AND 6) AND (TO_CHAR(SYSDATE, 'HH24') BETWEEN 7 AND 23))
+        OR ((TO_CHAR(SYSDATE, 'D') = 7) AND (TO_CHAR(SYSDATE, 'HH24') BETWEEN 8 AND 23))
+        OR ((TO_CHAR(SYSDATE, 'D') =1) AND (TO_CHAR(SYSDATE, 'HH24') BETWEEN 9 AND 20))) THEN 
+            adaugare_log('Nu se pot face modificari in timpul programului de operare.');
+            RAISE_APPLICATION_ERROR(-20010, 'Nu se pot face modificari in timpul programului de operare.');
+        END IF;
+    END IF;
+
+    adaugare_log('Baza de date a fost modificata.');
+    dbms_output.put_line('Modificari realizate!');
+END;
+/
+
+select * from log_modificari;
+
+-- pentru testarea tuturor erorilor am incercat sa adaug acest tabel, am modificat paraetrii putin pentru obtinerea tuturor erorilor posibile din ss
+
+CREATE TABLE dummy (    
+    nume_utilizator varchar2(100),
+    nume_bd varchar2(100),
+    eveniment varchar2(100),
+    nume_obiect varchar2(100),
+    data DATE,
+    mesaj varchar2(100)
+);
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- CERINTA 13
+
+
+CREATE OR REPLACE TYPE tabel_de_returnat_mariri IS OBJECT ( nume varchar(100),
+                                                            salariu_vechi number(10),
+                                                            salariu_nou number(10),
+                                                            pozitie varchar(100));
+/
+CREATE OR REPLACE TYPE tabel_mariri IS TABLE OF tabel_de_returnat_mariri;
+/
+    
+CREATE OR REPLACE PACKAGE supermarket_management IS
+    
+------- cerinta 6
+	PROCEDURE cel_mai_bine_vandut_produs;
+
+------- cerinta 7
+	PROCEDURE calcularea_magazinului_cu_plata_cea_mai_buna;
+
+------- cerinta 8
+	FUNCTION angajati_acordare_marire ( nume_magazin magazin.nume%type, 
+        							  	procent_de_marire number) 
+	RETURN tabel_mariri;
+
+------- cerinta 9
+	PROCEDURE clienti_afectati_de_rechemare ( furnizor_afectat furnizor.nume%type, 
+    										  element_rechemat produs.descriere%type);
+
+END supermarket_management;
+/
+    
+CREATE OR REPLACE PACKAGE BODY supermarket_management IS
+
+------- cerinta 6
+    PROCEDURE cel_mai_bine_vandut_produs
+    IS 
+    	TYPE tabel_indexat IS TABLE OF continut_comanda.cantitate%type INDEX BY PLS_INTEGER;
+    	TYPE tabel_imbricat IS TABLE OF continut_comanda.id_produs%type;
+    
+    	nr_unitati_vandute tabel_indexat;  -- numarul de unitati vandute din fiecare produs vandut
+    	produse_vandute tabel_imbricat := tabel_imbricat();    --Id-urile produselor vandute
+    
+    	cantitate_maxima number := 0;
+    	i number := 0; -- indice de parcurgere 
+    	nume_produs produs.nume%type;
+    BEGIN   	
+    	FOR vanzare IN ( SELECT id_produs, cantitate 
+        				 FROM continut_comanda) LOOP
+            i := 1;
+    
+    		WHILE i <= produse_vandute.COUNT AND produse_vandute(i) != vanzare.id_produs LOOP -- Cautam daca exista deja inregistrare de vanzare a acestui produs
+    			i := i + 1;
+            END LOOP;
+    		
+    		IF i = produse_vandute.COUNT + 1 THEN  -- In caz ca nu am gasit produsul deja adaugat il adaugam in lista de produse vandute
+    			produse_vandute.EXTEND;
+    			produse_vandute(produse_vandute.COUNT) := vanzare.id_produs;
+                nr_unitati_vandute(produse_vandute.COUNT) := vanzare.cantitate;
+    		
+    			IF nr_unitati_vandute(produse_vandute.COUNT) > cantitate_maxima THEN -- Calculam cantitatea maxima in timp real pt eficienta
+    				cantitate_maxima := nr_unitati_vandute(produse_vandute.COUNT);
+            	END IF;
+    		ELSE -- in cazul unui produs deja inregistrat ca vandut doar adaugam cantitatea noua la cea existenta
+            	nr_unitati_vandute(i) := nr_unitati_vandute(i) + vanzare.cantitate;
+        		
+    			IF nr_unitati_vandute(i) > cantitate_maxima THEN-- Calculam cantitatea maxima in timp real pt eficienta
+        			cantitate_maxima := nr_unitati_vandute(i);
+                END IF;
+    		END IF;
+        END LOOP;
+    
+    	IF cantitate_maxima = 0 THEN
+    		dbms_output.put_line('Nu avem vanzari inregistrate');
+        ELSE
+        	FOR i IN 1..produse_vandute.COUNT LOOP -- Cautam numele produsului cu cantitate maxima vanduta si ii aflisam un mesaj intuitiv
+        		IF nr_unitati_vandute(i) = cantitate_maxima THEN
+        			SELECT nume INTO nume_produs
+                	FROM produs
+                	WHERE id_produs = produse_vandute(i);
+        
+                	dbms_output.put_line('Produs cel mai bine vandut: ' || nume_produs || ' in cantitate de: ' || cantitate_maxima || ' unitati');
+                END IF;
+            END LOOP;
+        END IF;
+    END cel_mai_bine_vandut_produs;
+
+
+------- cerinta 7
+	PROCEDURE calcularea_magazinului_cu_plata_cea_mai_buna
+    IS
+        TYPE lista_id IS TABLE OF angajat.id_magazin%type;
+        CURSOR salariile_medii IS -- creez cursor pentru aflarea salariilor medii oferite de fiecare magazin
+        	SELECT AVG(salariu), id_magazin
+        	FROM informatii_salariale JOIN (SELECT id_angajat, id_magazin
+            								FROM angajat) USING (id_angajat)
+        	GROUP BY id_magazin;
+    
+    	media_curenta number;
+    	magazin_curent angajat.id_magazin%type;
+    	maxim_medie_salarii number := 0;
+    	lista_magazine lista_id := lista_id();
+    	nume_magazin magazin.nume%type;
+    BEGIN
+        OPEN salariile_medii;
+        	LOOP
+        		FETCH salariile_medii into media_curenta, magazin_curent; -- parcurg datele din cursor una cate una
+        		EXIT WHEN salariile_medii%NOTFOUND;
+        
+        		IF media_curenta > maxim_medie_salarii THEN -- aflu media maxima si salvez toate magazinele care o ofera
+                	maxim_medie_salarii := media_curenta;
+        			lista_magazine.DELETE;
+        			lista_magazine.extend;
+        			lista_magazine(lista_magazine.COUNT) := magazin_curent;
+        		ELSIF media_curenta = maxim_medie_salarii THEN
+        			lista_magazine.extend;
+        			lista_magazine(lista_magazine.COUNT) := magazin_curent;
+                END IF;
+        	END LOOP;
+    	CLOSE salariile_medii;
+    
+    	IF lista_magazine.COUNT = 0 THEN -- in cazul in care nu avem date sause intampla ceva la preluarea datelor.
+            dbms_output.put_line('NU avem date despre salariile oferite');
+    	ELSE 
+    
+            FOR i IN 1..lista_magazine.COUNT LOOP -- preiau numele magazinului bazat pe id-ul salvat mai devreme
+                SELECT nume INTO nume_magazin
+                FROM magazin
+                WHERE id_magazin = lista_magazine(i);
+    
+            	dbms_output.put_line('Cele mai bune salarii sunt oferite de ' || nume_magazin || ' ');
+    		END LOOP;
+       END IF;
+    
+    END calcularea_magazinului_cu_plata_cea_mai_buna;
+
+------- cerinta 8
+	FUNCTION angajati_acordare_marire(nume_magazin magazin.nume%type, procent_de_marire number) 
+    RETURN tabel_mariri IS
+        
+    	nr_magazine_numite_la_fel number := 0;
+    	lista_mariri tabel_mariri := tabel_mariri();
+    
+    	TOO_MANY_STORES EXCEPTION;
+        NO_STORE_FOUND EXCEPTION;
+    BEGIN
+        SELECT COUNT(id_magazin) INTO nr_magazine_numite_la_fel
+        FROM magazin
+        WHERE ((UPPER(nume) LIKE UPPER(nume_magazin)) OR (UPPER(adresa) LIKE UPPER(nume_magazin))); -- Verific daca magazinul introdus are acelasi nume cu alt magazin din lista
+    																								-- sau daca adresa sau numele introdus este valid
+    
+    	IF nr_magazine_numite_la_fel > 1 THEN -- in cazul in care avem mai multe magazine cu acelasi nume trebuie inrtodusa adresa
+        	raise TOO_MANY_STORES; 
+        ELSIF nr_magazine_numite_la_fel = 0 THEN -- in cazul in care numele sau adresa introdusa nu au fost gasite
+        	raise NO_STORE_FOUND;
+        END IF;
+    
+    	FOR linie IN (  SELECT prenume || ' ' || nume_familie as nume, 
+            				   salariu as salariu_vechi, 
+            				   (salariu + (salariu * procent_de_marire / 100)) as salariu_nou, 
+            				   pozitie, 
+            			       a.id_angajat -- preluam datele ce trebuiesc returnate
+                        FROM angajat a JOIN informatii_salariale i_s ON (a.id_angajat = i_s.id_angajat)
+                        			   JOIN magazin m ON (m.id_magazin = a.id_magazin) -- folosim 3 tabele - magazin. informatii_saalriale si angajat
+                        WHERE ( (UPPER(m.nume) LIKE UPPER(nume_magazin)) OR               --verific daca numele saua ddresa se potrivesc si conditia de acordare a maririi
+            					(UPPER(m.adresa) LIKE UPPER(nume_magazin))) AND 
+            					i_s.ultima_marire NOT BETWEEN (SYSDATE-365) AND SYSDATE) LOOP 
+        	lista_mariri.extend;
+    		lista_mariri(lista_mariri.COUNT) := tabel_de_returnat_mariri(linie.nume,  linie.salariu_vechi, linie.salariu_nou, linie.pozitie); -- adaugam in lista de returnat
+    
+        	UPDATE informatii_salariale -- facem schimarea salariului cu cel marit
+            SET salariu = linie.salariu_nou,
+                ultima_marire = SYSDATE
+            WHERE id_angajat = linie.id_angajat;
+        END LOOP;
+    
+    	IF lista_mariri.COUNT = 0 THEN -- in cazul in care pt magazinul ales nu exista angajati care primesc marire
+        	raise NO_DATA_FOUND;
+        END IF;
+    
+    	RETURN lista_mariri;
+    
+     EXCEPTION -- definim exceptiile
+        WHEN NO_DATA_FOUND THEN
+        	RAISE_APPLICATION_ERROR(-20004, 'Nu avem angajati care se califica pentru mariri');
+    	WHEN TOO_MANY_STORES THEN
+        	RAISE_APPLICATION_ERROR(-20003, 'Prea multe magazine cu acelasi nume, introduceti adresa si incercati din nou');
+    	WHEN NO_STORE_FOUND THEN
+        	RAISE_APPLICATION_ERROR(-20002, 'Nu am gasit magazin cu acest nume sau adresa');
+        WHEN others THEN
+        	RAISE_APPLICATION_ERROR(-20001, SQLERRM);
+    
+    END angajati_acordare_marire;
+
+------- cerinta 9
+    PROCEDURE clienti_afectati_de_rechemare ( furnizor_afectat furnizor.nume%type, 
+        									  element_rechemat produs.descriere%type) IS
+    	TYPE client_afectat IS TABLE OF VARCHAR(1000);
+    
+    	lista_clienti_afectati client_afectat := client_afectat(); -- Definim lista ce va fi afisata
+    	id_furnizor_afectat furnizor.id_furnizor%type;
+    
+    	NO_AFFECTED_CLIENTS EXCEPTION; -- declar exceptia care nu e predefinita
+    BEGIN
+    	SELECT id_furnizor INTO id_furnizor_afectat -- Verificam daca furnizoruil inclus exista / este unic
+        FROM furnizor
+        WHERE UPPER(nume) LIKE UPPER(furnizor_afectat);
+        
+    	SELECT 'Date de contact client - email: ' || email || ', numarul de telefon: ' || telefon || ' va trebui contactat.' BULK COLLECT INTO lista_clienti_afectati -- Cream textul de afisat cu datele clientului 
+        FROM client
+        WHERE id_client IN (SELECT id_client -- preluam toate comenzile care contin produse afectate
+        					FROM comanda
+        					WHERE id_comanda IN (SELECT id_comanda
+        										 FROM continut_comanda
+        										 WHERE id_produs IN (SELECT id_produs -- preluam toate produsele care contin elementul rechemat pt ca asta le afecteaza
+        															 FROM produs
+        															 WHERE (UPPER(descriere) LIKE '%' || UPPER(element_rechemat) || '%') 
+        																   AND id_produs IN (SELECT id_produs
+        																	  		 		 FROM produs_furnizor
+        																					 WHERE id_furnizor = id_furnizor_afectat))));
+    
+    	IF lista_clienti_afectati.COUNT = 0 THEN
+    		RAISE NO_AFFECTED_CLIENTS;
+    	END IF;
+    
+        FOR i IN 1..lista_clienti_afectati.COUNT LOOP
+    		dbms_output.put_line(lista_clienti_afectati(i));
+        END LOOP;
+    
+        EXCEPTION -- definim exceptiile
+            WHEN NO_DATA_FOUND THEN
+            	RAISE_APPLICATION_ERROR(-20004, 'Nu exista furnizori afectati pentru produsele vandute.'); -- suprascriu exceptiile cu mesaje customizate
+        	WHEN TOO_MANY_ROWS THEN
+            	RAISE_APPLICATION_ERROR(-20003, 'Furnizorul nu poate fi identificat pentu ca exista mai multi cu acelasi nume.');-- suprascriu exceptiile cu mesaje customizate
+        	WHEN NO_AFFECTED_CLIENTS THEN
+            	RAISE_APPLICATION_ERROR(-20002, 'Nici un client nu a fost afectat de aceste produse!'); -- definesc exceptia nou declarata
+            WHEN others THEN
+            	RAISE_APPLICATION_ERROR(-20001, SQLERRM);
+    END clienti_afectati_de_rechemare;
+
+END supermarket_management;
+/
+
+DECLARE 
+	lista_afisare tabel_mariri := tabel_mariri();
+BEGIN 
+    dbms_output.put_line('Cerinta 6');
+	supermarket_management.cel_mai_bine_vandut_produs;
+
+    dbms_output.put_line('Cerinta 7');
+	supermarket_management.calcularea_magazinului_cu_plata_cea_mai_buna;
+
+    dbms_output.put_line('Cerinta 8');
+	lista_afisare := supermarket_management.angajati_acordare_marire('Str. V. olt, 139', 10);
+	FOR i IN 1..lista_afisare.COUNT LOOP
+		dbms_output.put_line(i || '. ' || lista_afisare(i).nume || ' -- Salariul vechi: ' || lista_afisare(i).salariu_vechi || ' -- Salariul nou: ' || lista_afisare(i).salariu_nou || ' -- Pozitia: ' || lista_afisare(i).pozitie);
+    END LOOP;
+
+    dbms_output.put_line('Cerinta 9');
+	supermarket_management.clienti_afectati_de_rechemare('PILOS', 'paine');
+END;
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- CERINTA 14
+
+-- Perntru un furnizor si o lista de produse date se vor face urtmatoarele actiuni automat:
+-- Se va intrioduce noul furnizor si toate produsele
+-- se vor realizalegaturile si intrarile in tabelul de legatura
+-- pentru produsele care au specificat o reducere se va introduce o reducere cu valoarea specificata pana la data specificata
+
+CREATE OR REPLACE PACKAGE cerinta_14 IS
+    -- tip custom de dat4e pentru datele de intrare initiale pe care le vom procesa
+	TYPE produs_input IS RECORD ( nume_produs produs.nume%TYPE,
+                                  descriere produs.descriere%TYPE,
+                                  cantitate produs.cantitate%TYPE,
+                                  pret produs.pret%TYPE,
+                                  are_reducere boolean,
+                                  procent_reducere promotie.PROCENT_DISCOUNT%TYPE,
+                                  data_sfarsit_reducere promotie.data_sfarsit%TYPE);
+
+	TYPE lista_produse_input IS TABLE OF produs_input;
+
+	-- al doilea tip custom de date care vor fi procesate in lista de reduceri
+	TYPE discount IS RECORD( id_produs produs.id_produs%TYPE,
+        					 data_sfarsit_reducere promotie.data_sfarsit%TYPE,
+        					 procent_reducere promotie.PROCENT_DISCOUNT%TYPE);
+
+	-- procedura care va fi apelata de noi inital
+	PROCEDURE main ( nume_furnizor furnizor.nume%TYPE,
+        			 email_furnizor furnizor.email%TYPE,
+                     telefon_furnizor furnizor.telefon%TYPE,
+                     adresa_furnizor furnizor.adresa%TYPE,
+                     lista_produse lista_produse_input);
+        
+	FUNCTION procesare_date_furnizor( nume_furnizor furnizor.nume%TYPE,
+        							  email_furnizor furnizor.email%TYPE,
+        							  telefon_furnizor furnizor.telefon%TYPE,
+        							  adresa_furnizor furnizor.adresa%TYPE)
+    RETURN furnizor.id_furnizor%TYPE;
+
+	FUNCTION introducere_produs( nume_produs produs.nume%TYPE,
+        						 descriere_produs produs.descriere%TYPE,
+                                 pret_produs produs.pret%TYPE,
+    						     cantitate_produs produs.cantitate%TYPE,
+       							 id_furnizor_nou furnizor.id_furnizor%TYPE)
+	RETURN produs.id_produs%TYPE;
+
+	PROCEDURE adauga_reducere (promotie_noua discount);
+
+END cerinta_14;
+/
+
+CREATE OR REPLACE PACKAGE BODY cerinta_14 IS
+
+    -- adaug furnizorul cu datele introduse si returnez id_ul furnizorului nou creat
+	FUNCTION procesare_date_furnizor (nume_furnizor furnizor.nume%TYPE,
+        							 email_furnizor furnizor.email%TYPE,
+        							 telefon_furnizor furnizor.telefon%TYPE,
+        							 adresa_furnizor furnizor.adresa%TYPE)
+    RETURN furnizor.id_furnizor%TYPE IS
+    	nou_furnizor furnizor.id_furnizor%TYPE;
+    BEGIN
+		INSERT INTO furnizor 
+    	VALUES (SEQ_FURNIZOR.NEXTVAL, nume_furnizor, email_furnizor, telefon_furnizor, adresa_furnizor)
+    	RETURNING id_furnizor INTO nou_furnizor;
+		
+		RETURN nou_furnizor;
+    END procesare_date_furnizor;
+
+	-- introduc produsul curent si relatia produs-furnizor in tabelul corespunzator
+	FUNCTION introducere_produs( nume_produs produs.nume%TYPE,
+        						 descriere_produs produs.descriere%TYPE,
+                                 pret_produs produs.pret%TYPE,
+    						     cantitate_produs produs.cantitate%TYPE,
+       							 id_furnizor_nou furnizor.id_furnizor%TYPE)
+	RETURN produs.id_produs%TYPE IS
+        id_produs_nou produs.id_produs%TYPE;
+    BEGIN
+        -- adaug produsul nou
+		INSERT INTO produs 
+        VALUES(SEQ_PRODUS.NEXTVAL, nume_produs, descriere_produs, pret_produs, cantitate_produs)
+        RETURNING id_produs INTO id_produs_nou;
+
+		-- si relatia dintre produs si furnizor
+		INSERT INTO produs_furnizor
+        VALUES (id_furnizor_nou, id_produs_nou);
+
+		RETURN id_produs_nou;
+    END introducere_produs;
+
+
+	PROCEDURE adauga_reducere (promotie_noua discount) IS
+    BEGIN
+		INSERT INTO promotie
+        VALUES (SEQ_PROMOTIE.NEXTVAL, promotie_noua.id_produs, SYSDATE, promotie_noua.data_sfarsit_reducere, promotie_noua.procent_reducere);
+    END adauga_reducere;
+
+
+    PROCEDURE main ( nume_furnizor furnizor.nume%TYPE,
+        			 email_furnizor furnizor.email%TYPE,
+                     telefon_furnizor furnizor.telefon%TYPE,
+                     adresa_furnizor furnizor.adresa%TYPE,
+                     lista_produse lista_produse_input) IS
+    
+    	id_furnizor_nou furnizor.id_furnizor%TYPE;
+        id_produs_nou produs.id_produs%TYPE;
+		promotie_noua discount;
+    BEGIN
+        -- Adaugam noul furnizor si returnam id_ul acestuia pentru mai tarziu
+		id_furnizor_nou := procesare_date_furnizor(nume_furnizor, email_furnizor, telefon_furnizor, adresa_furnizor);
+
+        -- Parcurgem fiecare produs de adaugat
+        FOR i IN lista_produse.FIRST..lista_produse.LAST LOOP
+            -- adaug produsul nou
+			id_produs_nou := introducere_produs(lista_produse(i).nume_produs, lista_produse(i).descriere, lista_produse(i).pret, lista_produse(i).cantitate, id_furnizor_nou);
+
+			-- verific daca are discount si daca da atunci adaug discountul
+			IF lista_produse(i).are_reducere = true THEN
+                promotie_noua.id_produs := id_produs_nou;
+                promotie_noua.data_sfarsit_reducere := lista_produse(i).data_sfarsit_reducere;
+                promotie_noua.procent_reducere := lista_produse(i).procent_reducere;
+                
+				adauga_reducere(promotie_noua);
+			END IF;
+        END LOOP;
+        
+    END main;
+END cerinta_14;
+/
+
+
+DECLARE
+	lista_produse cerinta_14.lista_produse_input := cerinta_14.lista_produse_input( cerinta_14.produs_input('Produs 1', 'Descriere produs 1', 10, 7, true, 25, TO_DATE('26-07-2023','dd-mm-yyyy')),
+    																				cerinta_14.produs_input('Produs 2', 'Descriere produs 2', 20, 5, true, 25, TO_DATE('26-07-2023','dd-mm-yyyy')),
+																					cerinta_14.produs_input('Produs 3', 'Descriere produs 3', 30, 23, false, NULL, NULL),
+																					cerinta_14.produs_input('Produs 4', 'Descriere produs 4', 40, 55, false, NULL, NULL));
+BEGIN
+	cerinta_14.main('Test_furnizor4', 'Test_furnizor4@gmail.com', '0700010034', 'Str. Business 104', lista_produse);
+END;
+/
+
+SELECT * FROM FURNIZOR;
+SELECT * FROM PRODUS;
+SELECT * FROM PROMOTIE;
+SELECT * FROM produs_furnizor;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
